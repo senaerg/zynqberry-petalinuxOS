@@ -1,0 +1,39 @@
+################################################################################
+# U-Boot Environment Configuration for Trenz Electronic ZynqBerry (TE0726)
+# Target OS: PetaLinux (Kernel & Device Tree on SD FAT32, RootFS on SD EXT4)
+################################################################################
+
+# 1. Verification Command
+# Ensure your SD Card maps to device 0. Run this first:
+mmc list
+
+# ------------------------------------------------------------------------------
+# 2. Set Commands to Copy Device Tree Blob (DTB) and Kernel Image into RAM
+# ------------------------------------------------------------------------------
+setenv cp_dtb2ram 'fatload mmc 0 ${dtbnetstart} ${dtb_img}'
+setenv cp_kernel2ram 'fatload mmc 0 ${netstart} ${kernel_img}'
+
+# ------------------------------------------------------------------------------
+# 3. Set Default Boot Sequences
+# ------------------------------------------------------------------------------
+setenv default_bootcmd 'run cp_kernel2ram && cp_dtb2ram && bootm ${netstart} - ${dtbnetstart}'
+
+# ------------------------------------------------------------------------------
+# 4. Set Kernel Boot Arguments
+# Specifies serial console details, points the kernel to partition 2 (/dev/mmcblk0p2), 
+# sets file system to ext4, establishes Read/Write permissions, and adds a root wait flag.
+# ------------------------------------------------------------------------------
+setenv bootargs 'console=ttyPS0,115200 earlyprintk root=/dev/mmcblk0p2 rootfstype=ext4 rw rootwait'
+
+# ------------------------------------------------------------------------------
+# 5. Save and Boot
+# Write variables to the onboard QSPI flash memory permanently, then launch.
+# ------------------------------------------------------------------------------
+saveenv
+boot
+
+################################################################################
+# NOTE FOR ALTERNATE STORAGE MAPPINGS:
+# If 'mmc list' shows your MicroSD card is mounted on device node 1 instead of 0,
+# replace 'mmc 0' with 'mmc 1' and '/dev/mmcblk0p2' with '/dev/mmcblk1p2' above.
+################################################################################
