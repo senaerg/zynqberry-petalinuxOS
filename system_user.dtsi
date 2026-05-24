@@ -1,0 +1,18 @@
+/include/ "system-conf.dtsi"
+/ {
+    /* 1. Define the external ULPI Transceiver Physical Interface (PHY) */
+    usb_phy0: usb_phy0 {
+        compatible = "ulpi-phy", "usb-nop-xceiv";
+        #phy-cells = <0>;
+        reg = <0xe0002000 0x1000>;
+        view-port = <0x170>;
+        drv-vbus;
+    };
+};
+
+/* 2. Bind the physical transceiver definition back to the SoC USB Controller */
+&usb0 {
+    status = "okay";
+    dr_mode = "host";              /* Explicitly forces the Zynq into USB Host controller mode */
+    usb-phy = <&usb_phy0>;         /* Links controller to the transceiver mapped above */
+};
